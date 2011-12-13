@@ -1,5 +1,4 @@
 
-#pos=0 is defined to be at the center axis of the incoming ions
 def field(pos):
     """
     Calculates the electric field at a given position in the instrument.
@@ -59,7 +58,8 @@ def acceleration(field,mass):
 def flight_time(mass,pos=0):
     """
     Calculates total flight time of an ion of given mass
-    This function may need some tidying up.
+    Consider to change how this function optimizes for speed, there might
+    be much better solutions...
     
     Args:
         mass: Mass of the ion
@@ -67,57 +67,51 @@ def flight_time(mass,pos=0):
         
     Returns:
         t: The actual flighttime
-        status_text: ....
-        values: ...
+        values: Named list containing performance data: time, pos, speed
         
     Raises:
         ...
     """
+    detected = False
     t = 0
-    dt = 1e-10
-    dT = dt
+    dT = dt = 1e-10
     v = dt # Just to make sure v is positive from the beginning
     i = 0
     valid_until = -100000
     values = {} #Named list containing various status-information
     values['time'] = values['speed'] = values['pos'] = []
-    while (((pos < 110.8) & (v>0)) | ((pos > 37.167) & (v<0))):
+
+    while not detected:
+        Field = field(pos)
+        E = Field[0]
+        A = acceleration(Field[0],mass)
         if v>0:
             if pos > valid_until:
-                Field = field(pos)
-                E = Field[0]
                 valid_until = Field[1]
-                A = acceleration(E,mass)
                 dT = dt
             else:
                 if ((pos+500*v*dT) < valid_until) & (E == 0):
                     dT = 50 * dt
         else:
             if pos < valid_until:
-                Field = field(pos)
-                E = Field[0]
                 valid_until = Field[2]
-                A = acceleration(E,mass)
                 dT = dt
             else:
-                if (pos > 29) & (E == 0): # BVAADDRRRR!!!! HACK!!!!
+                if (pos > 29) & (E == 0): # Going back in the field free region
                     dT = 50 * dt
 
         v = v + A*dT
         pos = pos + (v*dT) * 100 # pos is in cm
         t = t+dT
         i = i+1
-        if (i%100 == 0):
+        detected = ((pos>110.8) | ((pos < 37.167) & (v<0)))
+
+        if (i%10 == 0): #Collects potentially usable performence data for every 10'th iteration
             values['time'].append(t*1e6)
             values['pos'].append(pos)
             values['speed'].append(v)
 
-
-    s1 =  "Time {0:.3f} microseconds".format(t*1e6)
-    s2 =  "Speed: {0:.2f} km/s".format(v / 1000)
-    s3 =  "Distance error: {0}".format(pos-107.5)
-    status_text = s1 + "\n" + s2 + "\n" + s3
-    return (t,status_text,values)
+    return (t,values)
 
 
 
