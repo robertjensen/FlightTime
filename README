@@ -1,1 +1,6 @@
 This programs calculates flighttimes for a given ion in a Jordan Time-Of-Flight-Mass sepctrometer.
+
+The package contains two modules and a main program file.
+Modules:
+tof_model: Contain all the physics, including both the simulation code and the physical parameters such as distances and voltages
+tof_helpers: Contain helper functions that will provide different was of easy access to the tof_model code

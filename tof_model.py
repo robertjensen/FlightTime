@@ -1,5 +1,11 @@
 global Voltages
 
+#These should properly be stored in a bit more systematic way...
+global FAST_POS
+global SLOW_POS
+SLOW_POS =  0.62
+FAST_POS = -0.62
+
 def field(pos):
     """
     Calculates the electric field at a given position in the instrument.
