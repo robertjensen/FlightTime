@@ -2,8 +2,47 @@ import scipy as sp
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
+from scipy import optimize
 
 import tof_model as tm
+
+
+
+def extrapolate():
+    times = []
+    masses = []
+    for mass in range(1,20):
+        times.append(tm.flight_time(mass))
+        masses.append(mass)
+
+
+    # Fit the first set
+    fitfunc = lambda p, x: p[0]*x**0.5 + p[1] # Target function
+    errfunc = lambda p, x, y: fitfunc(p, x) - y # Distance to the target function
+    p0 = [1, 0,] # Initial guess for the parameters
+    p1, success = optimize.leastsq(errfunc, p0[:], args=(masses, times))
+
+    time = sp.linspace(1, 50, 100)
+    plt.plot(masses, times, "ro", time, fitfunc(p1, time), "r-") # Plot of the data and the fit
+
+
+    # Legend the plot
+    plt.title("Oscillations in the compressed trap")
+    plt.xlabel("time [ms]")
+    plt.ylabel("displacement [um]")
+    plt.legend(('x position', 'x fit', 'y position', 'y fit'))
+
+    #ax = axes()
+
+    #text(0.8, 0.07,
+    #     'x freq :  %.3f kHz' % (1/p1[1]),
+    #     fontsize=16,
+    #     horizontalalignment='center',
+    #     verticalalignment='center',
+    #     transform=ax.transAxes)
+
+    plt.show()
+
 
 def draw_trajectory(mass):
     """
