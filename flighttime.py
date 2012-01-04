@@ -29,9 +29,9 @@ if tm.Voltages['R2'] <= 0: # Liniar mode
 """ Under here starts random experimentation that needs to be cleaned up """
 
 
-tof_helpers.extrapolate()
+#tof_helpers.extrapolate()
 
-#tof_helpers.print_flighttimes(False,True,False)
+tof_helpers.print_flighttimes(False,True,False)
 
 #R1_Voltage = 0
 #R2_Voltage = 0

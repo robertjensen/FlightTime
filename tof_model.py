@@ -55,9 +55,10 @@ def acceleration(field,mass):
     Raises:
         ...
     """
-    elementary_charge = -1.602e-19
-    force = field * elementary_charge * 100
-    acc = force / (mass * 1.6605e-27)
+    #elementary_charge = -1.602e-19
+    #force = field * elementary_charge * 100
+    #acc = force / (mass * 1.6605e-27)
+    #acc = -96476964.8 * field / mass
     return acc
 
 def flight_time(mass,pos=0):
