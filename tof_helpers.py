@@ -3,12 +3,25 @@ import matplotlib as mpl
 #mpl.use('Agg')
 import matplotlib.pyplot as plt
 from scipy import optimize
-
 import tof_model as tm
 
 
 
 def extrapolate():
+    """
+    Uses the physical model on a few (currently 10) masses
+    to create a fitting-expression for the flight-time as
+    a function of mass.
+    Currently the function takes no arguments, but obviously
+    it will be nice to be able to set the range and number
+    of masses used in the fit
+    Args:
+        None
+    Returns:
+        The two coefficients for the extrapolation
+    Raises:
+    """
+
     times = []
     masses = []
     for mass in range(1,50,5):
@@ -25,18 +38,14 @@ def extrapolate():
     p0 = [1, 0.5] # Initial guess for the parameters
     p1, success = optimize.leastsq(errfunc, p0[:], args=(masses, times))
 
-    print p1
     time = sp.linspace(0, 100, 500)
     plt.plot(masses, times, "ro", time, fitfunc(p1, time), "r-") # Plot of the data and the fit
 
-
     # Legend the plot
-    plt.title("Calculated Flighttime")
-    plt.xlabel("Mass [amu]")
-    plt.ylabel("Expected flighttime (microseconds)")
-
+    #plt.title("Calculated Flighttime")
+    #plt.xlabel("Mass [amu]")
+    #plt.ylabel("Expected flighttime (microseconds)")
     #ax = axes()
-
     #text(0.8, 0.07,
     #     'x freq :  %.3f kHz' % (1/p1[1]),
     #     fontsize=16,
@@ -44,8 +53,8 @@ def extrapolate():
     #     verticalalignment='center',
     #     transform=ax.transAxes)
 
-    plt.show()
-
+    #plt.show()
+    return p1
 
 def draw_trajectory(mass):
     """
@@ -75,7 +84,9 @@ def draw_trajectory(mass):
 
 def print_flighttimes(html, print_values,export_figure):
     """
-    Print flight times of various masse
+    Print flight times of various masses. This is done by
+    calling the extrapolate function and then use the
+    returned expression to calculate the values
     Args:
         html: If true, the output will be formatted for a web-browser
         print_values...
@@ -87,15 +98,16 @@ def print_flighttimes(html, print_values,export_figure):
     """
     flight_times = []
     masses = []
+    coeff = extrapolate()
     for mass in range(1,50): 
-        res = tm.flight_time(mass)
+        res = coeff[0] * (mass ** coeff[1])
         if print_values:
             #print "Flight time of {}: {:.3f} microsceonds".format(mass,res[0]*1e6)
-            print "{} {:.3f}".format(mass,res[0]*1e6)
+            print "{0} {1:.3f}".format(mass,res)
             if html:
                 print "<br>"
         masses.append(mass)
-        flight_times.append(res[0]*1e6)
+        flight_times.append(res)
     if export_figure:
         fig = plt.figure()
         ax11 = fig.add_subplot(111)
