@@ -1,14 +1,16 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import tof_model as tm
+import tof_helpers
 matplotlib.rc('text',usetex=True) # Magic fix for the font warnings
 
 def MassReferences():
     #Spectrum: 245
     masses = {}
-    masses['_28_']  = [70            ,24.859 ,15.0]
-    masses['_27_']  = [69            ,24.665 ,15.0]
-    masses['_26_']  = [68            ,24.491 ,15.0]
+    masses['_28_']  = [69            ,24.859 ,15.0]
+    masses['_27_']  = [68            ,24.665 ,15.0]
+    masses['_26_']  = [67            ,24.491 ,15.0]
     masses['_25_']  = [64            ,23.925  ,5.0]
     masses['_24_']  = [60            ,23.181 ,10.0]
     masses['_23_']  = [58            ,22.8   ,10.0]
@@ -58,13 +60,39 @@ def MassReferences():
 
     return mass_ref
 
+#When run as a stand-alone program, the reference file will try to compare
+#itself against the model
 if __name__ == '__main__':
     mass_ref = MassReferences()
 
+    #These values are corresponding to the reference set conditions
+    tm.Voltages['pulse'] = 800
+    tm.Voltages['liner'] = -2321.62
+    tm.Voltages['R1'] = -702.699
+    tm.Voltages['R2'] = 1119.72
+
+    #Offset calculated for water
+    p1 = tof_helpers.extrapolate()
+    modelfunc = lambda p, x: p[0]*x**p[1]
+    offset_error = 12.7775 - modelfunc(p1,18.0105647)
+    modelfunc = lambda p, x: p[0]*x**p[1] + offset_error
+
+    xvalues = np.arange(0,80,0.1)
+    #yvalues = p1[0]*xvalues**p1[1]
+    yvalues = modelfunc(p1,xvalues)
+    
     fig = plt.figure()
-    axis = fig.add_subplot(1,1,1)
+    axis = fig.add_subplot(2,1,1)
     axis.plot(mass_ref[:,0], mass_ref[:,1],'ro')
-    #axis.errorbar(mass_ref[:,0], mass_ref[:,1], yerr=mass_ref[:,2]/1000,fmt='o')
+    axis.plot(xvalues, yvalues,'b-')
+
     axis.set_ylabel('Flight Time / $\mu$s')
     axis.set_xlabel('Molecular mass / amu')
+
+    axis = fig.add_subplot(2,1,2)
+    axis.plot(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000,'ro')
+    axis.errorbar(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000, yerr=mass_ref[:,2]*2,fmt='o')
+    axis.set_xlim(0,80)
+    axis.set_xlabel('Molecular mass / amu')
+    axis.set_ylabel('Model error / ns')
     plt.show()
