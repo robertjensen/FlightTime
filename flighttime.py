@@ -13,8 +13,6 @@ parser.add_option('--R1', action="store", default=-432, type=int, help='Voltage 
 parser.add_option('--R2', action="store", default=1791, type=int, help='Voltage at R2')
 (options, args) = parser.parse_args()
 
-
-tm.Voltages = {} # Contains all electrical values of the maching
 tm.Voltages['pulse'] = options.pulse
 tm.Voltages['liner'] = options.liner
 tm.Voltages['R1'] = options.R1

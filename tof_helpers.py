@@ -8,7 +8,7 @@ import tof_model as tm
 mpl.rc('text',usetex=True) # Magic fix for the font warnings
 
 
-def extrapolate(start=1,end=100,step=10,plot=True):
+def extrapolate(start=1,end=100,step=10,plot=False):
     """
     Uses the physical model on a few (currently 10) masses
     to create a fitting-expression for the flight-time as

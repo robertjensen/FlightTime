@@ -1,5 +1,11 @@
 global Voltages
 
+Voltages = {}
+Voltages['pulse'] = 400
+Voltages['liner'] = -2000
+Voltages['R1'] = -432
+Voltages['R2'] = 1791
+
 #These should properly be stored in a bit more systematic way...
 global FAST_POS
 global SLOW_POS
