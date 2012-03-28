@@ -84,7 +84,9 @@ def flight_time(mass,pos=0):
     i = 0
     valid_until = -100000
     values = {} #Named list containing various status-information
-    values['time'] = values['speed'] = values['pos'] = []
+    values['time'] = []
+    values['speed'] = []
+    values['pos'] = []
 
     while not detected:
         Field = field(pos)

@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 from scipy import optimize
 import tof_model as tm
 
+mpl.rc('text',usetex=True) # Magic fix for the font warnings
 
 
-def extrapolate():
+def extrapolate(start=1,end=100,step=10,plot=True):
     """
     Uses the physical model on a few (currently 10) masses
     to create a fitting-expression for the flight-time as
@@ -16,7 +17,10 @@ def extrapolate():
     it will be nice to be able to set the range and number
     of masses used in the fit
     Args:
-        None
+        start: First mass in the fit. Default=5
+        end: Last mass in the fit. Default = 100
+        step: Stepsize. Default = 10
+        plot: If true, a plot showing the fit will be produces. Default=False
     Returns:
         The two coefficients for the extrapolation
     Raises:
@@ -24,7 +28,7 @@ def extrapolate():
 
     times = []
     masses = []
-    for mass in range(1,50,5):
+    for mass in range(start,end,step):
         ft = tm.flight_time(mass)
         times.append(ft[0]*1e6)
         masses.append(mass)
@@ -38,22 +42,25 @@ def extrapolate():
     p0 = [1, 0.5] # Initial guess for the parameters
     p1, success = optimize.leastsq(errfunc, p0[:], args=(masses, times))
 
-    time = sp.linspace(0, 100, 500)
-    plt.plot(masses, times, "ro", time, fitfunc(p1, time), "r-") # Plot of the data and the fit
+    if plot:
+        fig = plt.figure()
+        #Plot the fit and the data-points
+        axis = fig.add_subplot(2,1,1)
 
-    # Legend the plot
-    #plt.title("Calculated Flighttime")
-    #plt.xlabel("Mass [amu]")
-    #plt.ylabel("Expected flighttime (microseconds)")
-    #ax = axes()
-    #text(0.8, 0.07,
-    #     'x freq :  %.3f kHz' % (1/p1[1]),
-    #     fontsize=16,
-    #     horizontalalignment='center',
-    #     verticalalignment='center',
-    #     transform=ax.transAxes)
+        mass_axis = sp.linspace(0, 100, 500)
+        # Plot of the data and the fit
+        axis.plot(masses, times, 'ro')
+        axis.plot(mass_axis, fitfunc(p1, mass_axis), 'r-')
+        axis.set_xlabel("Mass [amu]")
+        axis.set_ylabel("Expected flighttime (microseconds)")
 
-    #plt.show()
+        #Plot the error-function
+        axis = fig.add_subplot(2,1,2)
+        axis.plot(masses, (fitfunc(p1, masses)-times)*1000, 'ro')
+        axis.set_xlabel("Mass [amu]")
+        axis.set_ylabel("Fitting-error / ns")    
+        plt.show()
+    
     return p1
 
 def draw_trajectory(mass):
@@ -67,16 +74,17 @@ def draw_trajectory(mass):
     
     Raises:
     """
-    res =  tm.flight_time(mass,0)
-    res_slow =  tm.flight_time(mass,SLOW_POS)
-    res_fast =  tm.flight_time(mass,FAST_POS)
+    t,res =  tm.flight_time(mass,0)
+    t,res_slow =  tm.flight_time(mass,tm.SLOW_POS)
+    t,res_fast =  tm.flight_time(mass,tm.FAST_POS)
     fig = plt.figure()
     ax11 = fig.add_subplot(111)
-    #ax11.plot(res[3],res[2],res_slow[3],res_slow[2],res_fast[3],res_fast[2],'r-','b-','g-')
-    ax11.plot(res[3],res[2],'r-')
-    ax11.set_xlabel('Position / cm')
-    ax11.set_ylabel('Time / micro seconds')
-    plt.savefig('Trajectory.png')
+    ax11.plot(res['time'],res['pos'],'r-')
+    ax11.plot(res_slow['time'],res_slow['pos'],'g-')
+    ax11.plot(res_fast['time'],res_fast['pos'],'b-')
+    ax11.set_xlabel('Time / $\mu$s')
+    ax11.set_ylabel('Position / cm')
+    plt.savefig('Trajectory.png',dpi=300)
 
 
 
