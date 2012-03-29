@@ -47,7 +47,7 @@ def extrapolate(start=1,end=100,step=10,plot=False):
         #Plot the fit and the data-points
         axis = fig.add_subplot(2,1,1)
 
-        mass_axis = sp.linspace(0, 100, 500)
+        mass_axis = sp.linspace(0, end, 1000)
         # Plot of the data and the fit
         axis.plot(masses, times, 'ro')
         axis.plot(mass_axis, fitfunc(p1, mass_axis), 'r-')
