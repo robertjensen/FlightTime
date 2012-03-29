@@ -5,7 +5,6 @@ import optparse
 import tof_model as tm
 import tof_helpers 
 
-
 parser = optparse.OptionParser('Calculates expected flighttime in the TOF')
 parser.add_option('--html', action="store_true", default=False, help='Adds html line breaks to the text output')
 parser.add_option('--liner', '-L', action="store", default=-2000, type=int, help='Liner Voltage')
@@ -14,8 +13,6 @@ parser.add_option('--R1', action="store", default=-432, type=int, help='Voltage 
 parser.add_option('--R2', action="store", default=1791, type=int, help='Voltage at R2')
 (options, args) = parser.parse_args()
 
-
-tm.Voltages = {} # Contains all electrical values of the maching
 tm.Voltages['pulse'] = options.pulse
 tm.Voltages['liner'] = options.liner
 tm.Voltages['R1'] = options.R1
@@ -29,9 +26,9 @@ if tm.Voltages['R2'] <= 0: # Liniar mode
 """ Under here starts random experimentation that needs to be cleaned up """
 
 
-#tof_helpers.extrapolate()
+#tof_helpers.draw_trajectory(50)
 
-tof_helpers.print_flighttimes(False,True,False)
+tof_helpers.print_flighttimes(False,False,False)
 
 #R1_Voltage = 0
 #R2_Voltage = 0
