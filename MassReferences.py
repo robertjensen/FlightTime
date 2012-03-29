@@ -1,4 +1,5 @@
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import tof_model as tm
@@ -30,7 +31,8 @@ def MassReferences():
     masses['_9_']   = [40            ,18.947  ,2.0]
     masses['_8_']   = [39            ,18.725  ,3.0]
     masses['_7_']   = [36            ,17.986  ,4.0]
-    masses['_6_']   = [32            ,16.95   ,2.0] #Double peak?
+    masses['_6_']   = [32            ,16.9805 ,2.0] #Double peak?
+    masses['O2']    = [31.9898292    ,16.9705 ,0.5]
     masses['_5_']   = [31            ,16.713  ,2.0] 
     masses['_4_']   = [30            ,16.4395 ,1.0] 
     masses['_3_']   = [29            ,16.166  ,1.0] 
@@ -74,7 +76,7 @@ if __name__ == '__main__':
     #Offset calculated for water
     p1 = tof_helpers.extrapolate()
     modelfunc = lambda p, x: p[0]*x**p[1]
-    offset_error = 12.7775 - modelfunc(p1,18.0105647)
+    offset_error = 3.149 - modelfunc(p1,1.00782503207)
     modelfunc = lambda p, x: p[0]*x**p[1] + offset_error
 
     xvalues = np.arange(0,80,0.1)
@@ -82,17 +84,26 @@ if __name__ == '__main__':
     yvalues = modelfunc(p1,xvalues)
     
     fig = plt.figure()
+    fig.subplots_adjust(hspace=0.25)
+    ratio = 1
+    fig_width = 10
+    fig_width = fig_width /2.54     # width in cm converted to inches
+    fig_height = fig_width*ratio
+    fig.set_size_inches(fig_width,fig_height)
+
     axis = fig.add_subplot(2,1,1)
-    axis.plot(mass_ref[:,0], mass_ref[:,1],'ro')
-    axis.plot(xvalues, yvalues,'b-')
-
-    axis.set_ylabel('Flight Time / $\mu$s')
-    axis.set_xlabel('Molecular mass / amu')
-
+    axis.plot(xvalues, yvalues,'r-')
+    axis.plot(mass_ref[:,0], mass_ref[:,1],'bo',markersize=2)
+    axis.set_ylabel('Flight Time / $\mu$s', fontsize=8)
+    axis.set_xlabel('Molecular mass / amu', fontsize=8)
+    axis.tick_params(direction='in', length=2, width=1, colors='k',labelsize=8,axis='both',pad=3)
+    
     axis = fig.add_subplot(2,1,2)
-    axis.plot(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000,'ro')
-    axis.errorbar(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000, yerr=mass_ref[:,2]*2,fmt='o')
+    #axis.plot(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000,'ro',markersize=1.5)
+    axis.errorbar(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000, yerr=mass_ref[:,2],fmt='o',markersize=2)
     axis.set_xlim(0,80)
-    axis.set_xlabel('Molecular mass / amu')
-    axis.set_ylabel('Model error / ns')
-    plt.show()
+    axis.set_xlabel('Molecular mass / amu', fontsize=8)
+    axis.set_ylabel('Model error / ns', fontsize=8)
+    axis.tick_params(direction='in', length=2, width=1, colors='k',labelsize=8,axis='both',pad=3)
+    plt.savefig('reference_plot.png',dpi=300)
+    #plt.show()
