@@ -7,24 +7,51 @@ import tof_model as tm
 
 mpl.rc('text',usetex=True) # Magic fix for the font warnings
 
+def powerFit(x,y,FitExponent=True):
+    """
+    Fits the x and y data to an expression of the form
+    y = a*x^b
+    
+    Args:
+        x: The x-data points
+        y: The y-data points
+        FitExponent: If False, b wil be fixed to b=0.5
+    Return:
+        Two-element array with the values of a and b
+    Raises:
+        ...
+    """
+    
+    if FitExponent:
+        fitfunc = lambda p, x: p[0]*x**p[1] # Target function
+        p0 = [1, 0.5] # The initial guess for the parameters
+    else:
+        fitfunc = lambda p, x: p[0]*x**0.5
+        p0 = [1] 
+    errfunc = lambda p, x, y: fitfunc(p, x) - y # Distance to the target function
+    
+    p1, success = optimize.leastsq(errfunc, p0[:], args=(masses, times))
+    return p1
+
 
 def extrapolate(start=1,end=100,step=10,plot=False):
     """
     Uses the physical model on a few (currently 10) masses
     to create a fitting-expression for the flight-time as
     a function of mass.
-    Currently the function takes no arguments, but obviously
-    it will be nice to be able to set the range and number
-    of masses used in the fit
     Args:
         start: First mass in the fit. Default=5
-        end: Last mass in the fit. Default = 100
-        step: Stepsize. Default = 10
-        plot: If true, a plot showing the fit will be produces. Default=False
+        end:   Last mass in the fit. Default = 100
+        step:  Stepsize. Default = 10
+        plot:  If true, a plot showing the fit will be produces. Default=False
     Returns:
         The two coefficients for the extrapolation
     Raises:
+        ValueError: Raised on non-legal input parameters
     """
+    
+    if (start<1) or (end<start):
+        raise ValueError
 
     times = []
     masses = []

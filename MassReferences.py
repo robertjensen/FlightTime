@@ -1,6 +1,7 @@
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import numpy as np
 import tof_model as tm
 import tof_helpers
@@ -84,26 +85,34 @@ if __name__ == '__main__':
     yvalues = modelfunc(p1,xvalues)
     
     fig = plt.figure()
-    fig.subplots_adjust(hspace=0.25)
+    fig.subplots_adjust(hspace=0.05)
     ratio = 1
     fig_width = 10
     fig_width = fig_width /2.54     # width in cm converted to inches
     fig_height = fig_width*ratio
     fig.set_size_inches(fig_width,fig_height)
+    gs = gridspec.GridSpec(3, 1)
 
-    axis = fig.add_subplot(2,1,1)
+    axis = plt.subplot(gs[:-1, 0])
+    #axis = fig.add_subplot(2,1,1)
     axis.plot(xvalues, yvalues,'r-')
     axis.plot(mass_ref[:,0], mass_ref[:,1],'bo',markersize=2)
     axis.set_ylabel('Flight Time / $\mu$s', fontsize=8)
-    axis.set_xlabel('Molecular mass / amu', fontsize=8)
+    #axis.set_xlabel('Mass / amu', fontsize=8)
+    axis.set_xlabel('')
+    print axis.get_xticklabels()
+    axis.set_xticklabels([])
+    print axis.get_xticklabels()
     axis.tick_params(direction='in', length=2, width=1, colors='k',labelsize=8,axis='both',pad=3)
     
-    axis = fig.add_subplot(2,1,2)
+    #axis = fig.add_subplot(2,1,2)
+    axis = plt.subplot(gs[2, 0])
     #axis.plot(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000,'ro',markersize=1.5)
     axis.errorbar(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000, yerr=mass_ref[:,2],fmt='o',markersize=2)
     axis.set_xlim(0,80)
-    axis.set_xlabel('Molecular mass / amu', fontsize=8)
+    axis.set_xlabel('Mass / amu', fontsize=8)
     axis.set_ylabel('Model error / ns', fontsize=8)
+    axis.set_yticks([0,20,40,60,80,100])
     axis.tick_params(direction='in', length=2, width=1, colors='k',labelsize=8,axis='both',pad=3)
     plt.savefig('reference_plot.png',dpi=300)
     #plt.show()

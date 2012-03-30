@@ -27,8 +27,8 @@ if tm.Voltages['R2'] <= 0: # Liniar mode
 
 
 #tof_helpers.draw_trajectory(50)
-
-tof_helpers.print_flighttimes(False,False,False)
+tof_helpers.extrapolate(0,100,10,True)
+#tof_helpers.print_flighttimes(False,False,False)
 
 #R1_Voltage = 0
 #R2_Voltage = 0
