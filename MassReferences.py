@@ -74,12 +74,14 @@ if __name__ == '__main__':
     tm.Voltages['R1'] = -702.699
     tm.Voltages['R2'] = 1119.72
 
-    #Offset calculated for water
+    #Offset calculated for hydrogen
     p1 = tof_helpers.extrapolate()
     modelfunc = lambda p, x: p[0]*x**p[1]
     offset_error = 3.149 - modelfunc(p1,1.00782503207)
-    modelfunc = lambda p, x: p[0]*x**p[1] + offset_error
 
+    modelfunc = lambda p, x: p[0]*x**p[1] + offset_error
+    mass_modelfunc = lambda p,x: ((x-offset_error)/p[0])**(1.0/p[1])
+    
     xvalues = np.arange(0,80,0.1)
     #yvalues = p1[0]*xvalues**p1[1]
     yvalues = modelfunc(p1,xvalues)
@@ -91,28 +93,43 @@ if __name__ == '__main__':
     fig_width = fig_width /2.54     # width in cm converted to inches
     fig_height = fig_width*ratio
     fig.set_size_inches(fig_width,fig_height)
-    gs = gridspec.GridSpec(3, 1)
+    gs = gridspec.GridSpec(4, 1)
 
-    axis = plt.subplot(gs[:-1, 0])
+    axis = plt.subplot(gs[0:2, 0])
     #axis = fig.add_subplot(2,1,1)
     axis.plot(xvalues, yvalues,'r-')
     axis.plot(mass_ref[:,0], mass_ref[:,1],'bo',markersize=2)
     axis.set_ylabel('Flight Time / $\mu$s', fontsize=8)
     #axis.set_xlabel('Mass / amu', fontsize=8)
     axis.set_xlabel('')
-    print axis.get_xticklabels()
     axis.set_xticklabels([])
-    print axis.get_xticklabels()
+    axis.set_xlim(0,75)
     axis.tick_params(direction='in', length=2, width=1, colors='k',labelsize=8,axis='both',pad=3)
     
     #axis = fig.add_subplot(2,1,2)
     axis = plt.subplot(gs[2, 0])
     #axis.plot(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000,'ro',markersize=1.5)
     axis.errorbar(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000, yerr=mass_ref[:,2],fmt='o',markersize=2)
-    axis.set_xlim(0,80)
+    axis.set_xlim(0,75)
+    #axis.set_ylim(-20,20)
     axis.set_xlabel('Mass / amu', fontsize=8)
-    axis.set_ylabel('Model error / ns', fontsize=8)
-    axis.set_yticks([0,20,40,60,80,100])
+    axis.set_ylabel('Error / ns', fontsize=8)
+    axis.set_yticks([-10,0,10,20,30])
+    axis.set_xlabel('')
+    axis.set_xticklabels([])
     axis.tick_params(direction='in', length=2, width=1, colors='k',labelsize=8,axis='both',pad=3)
+    
+    axis = plt.subplot(gs[3, 0])
+    #axis.plot(mass_ref[:,0], (mass_ref[:,1]-modelfunc(p1,mass_ref[:,0]))*1000,'ro',markersize=1.5)
+    axis.errorbar(mass_ref[:,0], 1000*abs((mass_ref[:,0]-mass_modelfunc(p1,mass_ref[:,1]))), yerr=1000*abs(mass_modelfunc(p1,mass_ref[:,1])-mass_modelfunc(p1,mass_ref[:,1]-mass_ref[:,2]/1000)),fmt='o',markersize=2)
+
+    axis.set_xlim(0,75)
+    #axis.set_ylim(-199,199)
+    axis.set_xlabel('Mass / amu', fontsize=8)
+    axis.set_ylabel('Error / milliamu', fontsize=8)
+    axis.set_yticks([-50,0,50,100,150])
+    axis.tick_params(direction='in', length=2, width=1, colors='k',labelsize=8,axis='both',pad=3)
+
+    
     plt.savefig('reference_plot.png',dpi=300)
     #plt.show()

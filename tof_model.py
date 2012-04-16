@@ -27,14 +27,15 @@ def field(pos):
     Raises:
         ....
     """
-        
+    fiddle_factor = 0.43 #This value is chosen to give a small absolute
+                         #error, it incorporates errors in length and voltages
     Params = []
     Params.append((-0.635,Voltages['pulse']))   #A1
     Params.append((0.635,0))                    #A2
     Params.append((1.9685,Voltages['liner']))   #A3
-    Params.append((95.235,Voltages['liner']))   #Liner grid
-    Params.append((96.390,Voltages['R1']))      #R1
-    Params.append((110.81,Voltages['R2']))      #R2
+    Params.append((95.235+fiddle_factor,Voltages['liner']))   #Liner grid
+    Params.append((96.390+fiddle_factor,Voltages['R1']))      #R1
+    Params.append((110.81+fiddle_factor,Voltages['R2']))      #R2
     Params.append((10000,Voltages['R2']))       #This field extends to infinity
 
     i = 0
