@@ -1,3 +1,5 @@
+import math
+
 global Voltages
 
 Voltages = {}
@@ -41,8 +43,9 @@ def field(pos):
     while Params[i][0] < pos:
         i = i+1
     field = (Params[i][1] - Params[i-1][1]) / (Params[i][0] - Params[i-1][0])
+    voltage = Params[i-1][1] + (Params[i-1][1]-Params[i][1]) * (pos - Params[i-1][0]) / (Params[i-1][0] - Params[i][0])
 
-    return (field,Params[i][0],Params[i-1][0]) #
+    return (field,Params[i][0],Params[i-1][0],voltage) #
 
 
 def acceleration(field,mass):
@@ -61,13 +64,12 @@ def acceleration(field,mass):
     Raises:
         ...
     """
-    #elementary_charge = -1.602e-19
-    #force = field * elementary_charge * 100
-    #acc = force / (mass * 1.6605e-27)
-    #acc = -96476964.8 * field / mass
+    elementary_charge = -1.602e-19
+    force = field * elementary_charge * 100
+    acc = force / (mass * 1.6605e-27)
     return acc
 
-def flight_time(mass,pos=0):
+def flight_time(mass,position=0):
     """
     Calculates total flight time of an ion of given mass
     Consider to change how this function optimizes for speed, there might
@@ -94,6 +96,8 @@ def flight_time(mass,pos=0):
     values['time'] = []
     values['speed'] = []
     values['pos'] = []
+    values['voltage'] = []
+    pos = position
 
     while not detected:
         Field = field(pos)
@@ -120,10 +124,11 @@ def flight_time(mass,pos=0):
         i = i+1
         detected = ((pos>110.8) | ((pos < 37.167) & (v<0)))
 
-        if (i%10 == 0): #Collects potentially usable performence data for every 10'th iteration
+        if (i%2 == 0): #Collects potentially usable performence data for every 10'th iteration
             values['time'].append(t*1e6)
             values['pos'].append(pos)
             values['speed'].append(v)
+            values['voltage'].append(Field[3])
 
     return (t,values)
 

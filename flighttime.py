@@ -2,6 +2,11 @@ import sys
 #import argparse
 import optparse
 
+import matplotlib as mpl
+#mpl.use('Agg')
+import matplotlib.pyplot as plt
+
+
 import tof_model as tm
 import tof_helpers 
 
@@ -26,10 +31,30 @@ if tm.Voltages['R2'] <= 0: # Liniar mode
 """ Under here starts random experimentation that needs to be cleaned up """
 
 
+a = tm.field(95.5)
+print a
+
 #tof_helpers.draw_trajectory(50)
 
-tof_helpers.print_flighttimes(False,False,False)
+#t_fast,v = tm.flight_time(49.9999)
+#t,v = tm.flight_time(50)
+#print t*1e6
+#fig = plt.figure()
+#Plot the fit and the data-points
+#axis = fig.add_subplot(1,1,1)
 
+# Plot of the data and the fit
+#axis.plot(v['time'], v['voltage'], 'r-')
+#axis.set_xlabel("Mass [amu]")
+#axis.set_ylabel("Expected flighttime (microseconds)")
+
+#plt.show()
+    
+
+#t_slow,v  =tm.flight_time(50.0001)
+
+#print (t-t_fast) * 1e9
+#print (t_slow-t) * 1e9
 #R1_Voltage = 0
 #R2_Voltage = 0
 
