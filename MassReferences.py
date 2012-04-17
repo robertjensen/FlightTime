@@ -126,7 +126,7 @@ if __name__ == '__main__':
     axis.set_xlim(0,75)
     #axis.set_ylim(-199,199)
     axis.set_xlabel('Mass / amu', fontsize=8)
-    axis.set_ylabel('Error / milliamu', fontsize=8)
+    axis.set_ylabel('Error / milli-amu', fontsize=8)
     axis.set_yticks([-50,0,50,100,150])
     axis.tick_params(direction='in', length=2, width=1, colors='k',labelsize=8,axis='both',pad=3)
 
