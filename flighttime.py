@@ -26,8 +26,13 @@ if tm.Voltages['R2'] <= 0: # Liniar mode
 """ Under here starts random experimentation that needs to be cleaned up """
 
 
-#tof_helpers.draw_trajectory(50)
-tof_helpers.extrapolate(0,100,10,True)
+tm.Voltages['pulse'] = 800
+tm.Voltages['liner'] = -2321.39
+tm.Voltages['R1'] = -702.616
+tm.Voltages['R2'] = 1119.71
+
+tof_helpers.draw_trajectory(50)
+#tof_helpers.extrapolate(0,100,10,True)
 #tof_helpers.print_flighttimes(False,False,False)
 
 #R1_Voltage = 0

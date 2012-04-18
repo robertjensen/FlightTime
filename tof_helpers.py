@@ -3,6 +3,7 @@ import matplotlib as mpl
 #mpl.use('Agg')
 import matplotlib.pyplot as plt
 from scipy import optimize
+from scipy import interpolate
 import tof_model as tm
 
 mpl.rc('text',usetex=True) # Magic fix for the font warnings
@@ -104,13 +105,40 @@ def draw_trajectory(mass):
     t,res =  tm.flight_time(mass,0)
     t,res_slow =  tm.flight_time(mass,tm.SLOW_POS)
     t,res_fast =  tm.flight_time(mass,tm.FAST_POS)
+
     fig = plt.figure()
+    fig.subplots_adjust(bottom=0.15) # Make room for x-label
+    ratio = 0.6
+    fig_width = 10
+    fig_width = fig_width /2.54     # width in cm converted to inches
+    fig_height = fig_width*ratio
+    fig.set_size_inches(fig_width,fig_height)    
+    
     ax11 = fig.add_subplot(111)
-    ax11.plot(res['time'],res['pos'],'r-')
-    ax11.plot(res_slow['time'],res_slow['pos'],'g-')
-    ax11.plot(res_fast['time'],res_fast['pos'],'b-')
-    ax11.set_xlabel('Time / $\mu$s')
-    ax11.set_ylabel('Position / cm')
+    ax11.plot(res['time'],res['pos'],'r-', linewidth=0.7)
+    ax11.plot(res_slow['time'],res_slow['pos'],'g-', linewidth=0.7)
+    ax11.plot(res_fast['time'],res_fast['pos'],'b-', linewidth=0.7)
+    ax11.set_xlabel('Time / $\mu$s', fontsize=8)
+    ax11.set_ylabel('Position / cm', fontsize=8)
+    ax11.set_xlim(0,22)
+    ax11.set_ylim(-2,120) 
+    ax11.tick_params(direction='in', length=2, width=1, colors='k',labelsize=8,axis='both',pad=3)
+    
+    ins_plt = plt.axes([0.4,0.23,0.4,0.175])
+    #plt.setp(ins_plt)
+
+    slow_interp = interpolate.interp1d(res_slow['time'],res_slow['pos'], bounds_error=False)
+    fast_interp = interpolate.interp1d(res_fast['time'],res_fast['pos'], bounds_error=False)
+    zero = [0]*len(res['time'])
+    
+    ins_plt.plot(res['time'],slow_interp(res['time'])-res['pos'],'g-', linewidth=0.7)
+    ins_plt.plot(res['time'],fast_interp(res['time'])-res['pos'],'b-', linewidth=0.7)
+    ins_plt.plot(res['time'],zero,'r-', linewidth=0.5)
+    ins_plt.set_ylabel('$\Delta$pos / cm', fontsize=7)
+    ins_plt.set_yticks([])
+    ins_plt.tick_params(direction='in', length=2, width=1, colors='k',labelsize=7,axis='both',pad=3)
+    ins_plt.set_xlim(0,22)
+
     plt.savefig('Trajectory.png',dpi=300)
 
 
@@ -150,6 +178,5 @@ def print_flighttimes(html, print_values,export_figure):
         ax11.set_xlabel('Mass / AMU')
         ax11.set_ylabel('Flight Time / micro seconds')
         plt.savefig('Masses.png')
-
 
 

@@ -9,8 +9,8 @@ Voltages['R2'] = 1791
 #These should properly be stored in a bit more systematic way...
 global FAST_POS
 global SLOW_POS
-SLOW_POS =  0.62
-FAST_POS = -0.62
+SLOW_POS =  0.63
+FAST_POS = -0.63
 
 def field(pos):
     """
