@@ -109,7 +109,7 @@ def draw_trajectory(mass):
     fig = plt.figure()
     fig.subplots_adjust(bottom=0.15) # Make room for x-label
     ratio = 0.6
-    fig_width = 10
+    fig_width = 8.5
     fig_width = fig_width /2.54     # width in cm converted to inches
     fig_height = fig_width*ratio
     fig.set_size_inches(fig_width,fig_height)    
